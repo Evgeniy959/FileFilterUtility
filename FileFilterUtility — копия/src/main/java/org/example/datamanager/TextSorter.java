@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -32,12 +31,7 @@ public class TextSorter {
         try {
             for (String inputFile : options.getInputFiles()) {
                 executor.submit(() -> {
-                    try {
-                        processFile(inputFile);
-                    } catch (IOException e) {
-                        System.err.println("Error processing file: " + inputFile + ". " + e.getMessage());
-                        //throw new RuntimeException(e);
-                    }
+                    dataFilter(inputFile);
                 });
             }
             executor.shutdown();
@@ -59,10 +53,10 @@ public class TextSorter {
 
     }
 
-    public Stream<String> loadContent(String name) {
+    public List<String> loadContent(String name) {
         try {
-            //var is = ClassLoader.getSystemResource(name);
-            return Files.lines(Paths.get(name));
+            var is = ClassLoader.getSystemResource(name);
+            return Files.readAllLines(Paths.get("D:\\D Aser\\Test2\\Java\\JavaProjects\\Projects\\FileFilterUtility\\src\\main\\java\\org\\example\\input\\" + name), UTF_8);
 //            var is = ClassLoader.getSystemResourceAsStream("input/" + name + ".txt");
 //            return new String(is.readAllBytes());
         } catch (IOException e) {
@@ -72,18 +66,20 @@ public class TextSorter {
         //return List.of("apple", "banana", "orange");
     }
 
-    private void processFile(String inputFile) throws IOException {
-        Files.lines(Paths.get(inputFile)).forEach(this::dataFilter);
-    }
-
-    private void dataFilter(String line) {
+    private void dataFilter(String input) {
         String type;
-        //for(String line : lines){
+        List<String> lines = loadContent(input);
+        for (int i = 0; i < lines.size(); i++) {
+            System.out.println(lines.get(i));
+        }
+        //String[] lines = str.split("/n");
+
+        for(String line : lines){
             if (DataParser.isInteger(line)) {
                 type = "integers";
                 //builderLines.append(String.format(line+"%n"));
                 //for (int i = 0; i < lines.length; i++) {
-                    //System.out.println(lines.get(1));
+                    System.out.println(lines.get(1));
                 //}
                 //integerStat.update(line);
             } else if (DataParser.isFloat(line)) {
@@ -100,7 +96,7 @@ public class TextSorter {
             } catch (IOException e) {
                 System.err.println("Не удалось записать строку в файл: " + e.getMessage());
             }
-        //}
+        }
 //        if (Parser.isInteger(line)) {
 //            type = Constants.INTEGER;
 //            integerStat.update(line);
