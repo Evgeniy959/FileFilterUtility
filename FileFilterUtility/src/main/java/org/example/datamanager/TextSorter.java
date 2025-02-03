@@ -32,12 +32,7 @@ public class TextSorter {
         try {
             for (String inputFile : options.getInputFiles()) {
                 executor.submit(() -> {
-                    try {
-                        processFile(inputFile);
-                    } catch (IOException e) {
-                        System.err.println("Error processing file: " + inputFile + ". " + e.getMessage());
-                        //throw new RuntimeException(e);
-                    }
+                    processFile(inputFile);
                 });
             }
             executor.shutdown();
@@ -62,7 +57,7 @@ public class TextSorter {
     public Stream<String> loadContent(String name) {
         try {
             //var is = ClassLoader.getSystemResource(name);
-            return Files.lines(Paths.get(name));
+            return Files.lines(Paths.get("D:\\D Aser\\Test3\\Java\\FileFilterUtility\\FileFilterUtility\\src\\main\\java\\org\\example\\input\\" + name));
 //            var is = ClassLoader.getSystemResourceAsStream("input/" + name + ".txt");
 //            return new String(is.readAllBytes());
         } catch (IOException e) {
@@ -72,8 +67,8 @@ public class TextSorter {
         //return List.of("apple", "banana", "orange");
     }
 
-    private void processFile(String inputFile) throws IOException {
-        Files.lines(Paths.get(inputFile)).forEach(this::dataFilter);
+    private void processFile(String inputFile) {
+        loadContent(inputFile).forEach(this::dataFilter);
     }
 
     private void dataFilter(String line) {
@@ -98,7 +93,7 @@ public class TextSorter {
             try {
                 writeLine(type, line);
             } catch (IOException e) {
-                System.err.println("Не удалось записать строку в файл: " + e.getMessage());
+                System.err.println("Не верно указан путь до файлов для записи результатов: " + e.getMessage());
             }
         //}
 //        if (Parser.isInteger(line)) {
