@@ -1,12 +1,11 @@
 package org.example.datamanager;
 
 import org.example.options.StartupOptions;
-import org.example.options.Type;
+import org.example.options.TypeFile;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,6 +30,7 @@ public class TextSorter {
     }
 
     public void processFiles() {
+        //clearOutputFilesIfRequired();
         try {
             for (String inputFile : options.getInputFiles()) {
                 executor.submit(() -> {
@@ -70,7 +70,7 @@ public class TextSorter {
         //return List.of("apple", "banana", "orange");
     }
 
-    private synchronized void dataFilter(String input) {
+    private void dataFilter(String input) {
         String type;
         List<String> lines = loadContent(input);
 //        for (int i = 0; i < lines.size(); i++) {
@@ -80,30 +80,20 @@ public class TextSorter {
 
         for(String line : lines){
             if (DataParser.isInteger(line)) {
-                //type = "integers";
-                bufferIntegers.append(String.format(line+"%n"));
-                //writeLine(type, bufferIntegers.toString());
-                //for (int i = 0; i < lines.length; i++) {
-                    //System.out.println(bufferIntegers.toString());
-                //}
+                type = TypeFile.INTEGER;
                 //integerStat.update(line);
             } else if (DataParser.isFloat(line)) {
-                //type = "floats";
-                bufferFloats.append(String.format(line+"%n"));
-                //writeLine(type, bufferFloats.toString());
+                type = TypeFile.FLOAT;
                 //floatStat.update(line);
             } else {
-                //type = "strings";
-                bufferStrings.append(String.format(line+"%n"));
-                //writeLine(type, bufferStrings.toString());
+                type = TypeFile.STRING;
                 //stringStat.update(line);
             }
-        }
-        //System.out.println(bufferFloats.toString());
-        try {
-            writeLine();
-        } catch (IOException e) {
-            System.err.println("Не удалось записать строку в файл: " + e.getMessage());
+            try {
+                writeLine(type, line);
+            } catch (IOException e) {
+                System.err.println("Не удалось записать строку в файл: " + e.getMessage());
+            }
         }
 //        if (Parser.isInteger(line)) {
 //            type = Constants.INTEGER;
@@ -123,36 +113,36 @@ public class TextSorter {
 //        }
     }
 
-    private synchronized void writeLine() throws IOException {
-        //String fileName = options.getOutputPath() + "/" + options.getPrefix() + type + ".txt";
-        System.out.println(bufferFloats.toString());
-        String[] fileTypes = {Type.INTEGER, Type.FLOAT, Type.STRING};
-        for (String type : fileTypes) {
-            String fileName = options.getOutputPath() + "/" + options.getPrefix() + type + ".txt";
-            try (FileWriter writer = new FileWriter(fileName, options.isAppendMode())) {
-                if (type.equals(Type.INTEGER)){
-                    writer.write(bufferIntegers.toString());
-                    writer.flush();
-                    //writer.newLine();
-                }
-                else if (type.equals(Type.FLOAT)){
-                    writer.write(bufferFloats.toString());
-                    writer.flush();
-                    //writer.newLine();
-                }
-                else if (type.equals(Type.STRING)){
-                    writer.write(bufferStrings.toString());
-                    writer.flush();
-                    //writer.newLine();
-                }
-
-            }
-        }
+    private synchronized void writeLine(String type, String line) throws IOException {
+        String fileName = options.getOutputPath() + "/" + options.getPrefix() + type + ".txt";
+//
 //        Path filePath = Paths.get(fileName);
 //        Path parentDir = filePath.getParent();
 //
 //        if (!Files.exists(parentDir)) {
 //            Files.createDirectories(parentDir);
 //        }
+//
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true))) {
+                writer.write(line);
+                writer.newLine();
+        }
+    }
+
+    private void clearOutputFilesIfRequired() {
+        if (!options.isAppendMode()) {
+            options.getInputFiles().forEach(inputFile -> {
+                String[] fileTypes = {TypeFile.INTEGER, TypeFile.FLOAT, TypeFile.STRING};
+                for (String type : fileTypes) {
+                    String fileName = options.getOutputPath() + "/" + options.getPrefix() + type + ".txt";
+                    Path filePath = Paths.get(fileName);
+                    try {
+                        Files.deleteIfExists(filePath);
+                    } catch (IOException e) {
+                        System.err.println("Failed to delete existing file: " + fileName + ". " + e.getMessage());;
+                    }
+                }
+            });
+        }
     }
 }
