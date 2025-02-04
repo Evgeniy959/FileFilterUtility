@@ -9,6 +9,8 @@ public class StartupOptions {
     private static String prefix = "";
     private static String inputFile;
     private static boolean appendMode = false;
+    private boolean shortStat=false;
+    private boolean fullStat = false;
     private final List<String> inputFiles = new ArrayList<>();
 
     public StartupOptions(String[] args) {
@@ -36,19 +38,36 @@ public class StartupOptions {
         return appendMode;
     }
 
+    public boolean isShortStat() {
+        return shortStat;
+    }
+
+    public boolean isFullStat() {
+        return fullStat;
+    }
+
     private void startup() {
         for (int i = 0; i < args.length; i++) {
             if ( args[i].equals("-o") && i+1<args.length) {
                 outputPath = args[i+1];
             }
-            else if (args[i].equals("-a")) {
+            if (args[i].equals("-a")) {
                 appendMode = true;
             }
-            else if (args[i].equals("-p") && i+1<args.length){
+            if (args[i].equals("-p") && i+1<args.length){
                 prefix = args[i+1];
             }
-            else if (args[i].endsWith(".txt")) {
+            if (args[i].endsWith(".txt")) {
                 inputFiles.add(args[i]);
+            }
+            if(args[i].equals("-s")){
+                shortStat = true;
+            }
+            if(args[i].equals("-f")){
+                fullStat = true;
+            }
+            else{
+                System.out.println("Введите команду. Для перехода к списку команд введите -h");
             }
         }
 
