@@ -40,16 +40,15 @@ public class StartupOptions {
         for (int i = 0; i < args.length; i++) {
             if ( args[i].equals("-o") && i+1<args.length) {
                 outputPath = args[i+1];
-                //System.out.println(str);
             }
-            if (args[i].equals("-a")) {
+            else if (args[i].equals("-a")) {
                 appendMode = true;
             }
-            if (args[i].equals("-p") && i+1<args.length)
+            else if (args[i].equals("-p") && i+1<args.length){
                 prefix = args[i+1];
-            if (!args[i].startsWith("-") /*&& !args[i-1].startsWith("-")*/) {
+            }
+            else if (args[i].endsWith(".txt")) {
                 inputFiles.add(args[i]);
-                //inputFile = args[i];
             }
         }
 
