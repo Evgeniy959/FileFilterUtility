@@ -1,15 +1,13 @@
 package org.example.datamanager;
 
 import org.example.options.StartupOptions;
-import org.example.options.Type;
+import org.example.options.TypeFile;
 
-import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,6 +22,8 @@ public class TextSorter {
     StringBuffer bufferIntegers = new StringBuffer();
     StringBuffer bufferFloats = new StringBuffer();
     StringBuffer bufferStrings = new StringBuffer();
+    List<String> lines = new ArrayList<>();
+    boolean flag = false;
 
     public TextSorter(StartupOptions options) {
         this.options = options;
@@ -55,12 +55,33 @@ public class TextSorter {
         //dataFilter(options.getInputFile());
 
     }
+//public void processFiles() {
+//
+//    try {
+//        for (String inputFile : options.getInputFiles()) {
+//            if (inputFile.equals("in1.txt")){
+//                if (!flag){
+//                    dataFilter(inputFile);
+//                }
+//
+//            } else /*if (flag)*/{
+//                //inputFile = "in2.txt";
+//                dataFilter(inputFile);
+//                flag = true;
+//            }
+//        }
+//    } catch (Exception e) {
+//        System.err.println("Непредвиденная ошибка: " + e.getMessage());
+//    }
+//}
 
-    public List<String> loadContent(String name) {
+    private synchronized List<String> loadContent(String name) {
         try {
 //            var is = ClassLoader.getSystemResource("input/" + name);
 //            System.out.println(is);
+
             return Files.readAllLines(Paths.get("D:\\D Aser\\Test2\\Java\\JavaProjects\\Projects\\FileFilterUtility\\src\\main\\java\\org\\example\\input\\" + name), UTF_8);
+            //return lines;
 //            var is = ClassLoader.getSystemResourceAsStream("input/" + name + ".txt");
 //            return new String(is.readAllBytes());
         } catch (IOException e) {
@@ -70,15 +91,15 @@ public class TextSorter {
         //return List.of("apple", "banana", "orange");
     }
 
-    private synchronized void dataFilter(String input) {
+    private void dataFilter(String input) {
         String type;
-        List<String> lines = loadContent(input);
-//        for (int i = 0; i < lines.size(); i++) {
+        //List<String> lines = loadContent(input);
+//        for (int i = 0; i < loadContent(input).size(); i++) {
 //            System.out.println(lines.get(i));
 //        }
         //String[] lines = str.split("/n");
 
-        for(String line : lines){
+        for(String line : loadContent(input)){
             if (DataParser.isInteger(line)) {
                 //type = "integers";
                 bufferIntegers.append(String.format(line+"%n"));
@@ -98,6 +119,7 @@ public class TextSorter {
                 //writeLine(type, bufferStrings.toString());
                 //stringStat.update(line);
             }
+            //if (!flag) break;
         }
         //System.out.println(bufferFloats.toString());
         try {
@@ -123,24 +145,24 @@ public class TextSorter {
 //        }
     }
 
-    private synchronized void writeLine() throws IOException {
+    private void writeLine() throws IOException {
         //String fileName = options.getOutputPath() + "/" + options.getPrefix() + type + ".txt";
         System.out.println(bufferFloats.toString());
-        String[] fileTypes = {Type.INTEGER, Type.FLOAT, Type.STRING};
+        String[] fileTypes = {TypeFile.INTEGER, TypeFile.FLOAT, TypeFile.STRING};
         for (String type : fileTypes) {
             String fileName = options.getOutputPath() + "/" + options.getPrefix() + type + ".txt";
             try (FileWriter writer = new FileWriter(fileName, options.isAppendMode())) {
-                if (type.equals(Type.INTEGER)){
+                if (type.equals(TypeFile.INTEGER)){
                     writer.write(bufferIntegers.toString());
                     writer.flush();
                     //writer.newLine();
                 }
-                else if (type.equals(Type.FLOAT)){
+                else if (type.equals(TypeFile.FLOAT)){
                     writer.write(bufferFloats.toString());
                     writer.flush();
                     //writer.newLine();
                 }
-                else if (type.equals(Type.STRING)){
+                else if (type.equals(TypeFile.STRING)){
                     writer.write(bufferStrings.toString());
                     writer.flush();
                     //writer.newLine();
