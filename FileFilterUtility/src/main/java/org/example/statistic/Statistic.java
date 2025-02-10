@@ -3,11 +3,11 @@ package org.example.statistic;
 public class Statistic {
     protected int count;
 
-    public void update(String line) {
+    public void change(String line) {
         count++;
     }
 
-    public String summarize() {
-        return "Total: " + count;
+    public String shortStatistics() {
+        return "количество элементов: " + count;
     }
 }

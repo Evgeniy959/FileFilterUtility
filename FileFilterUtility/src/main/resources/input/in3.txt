@@ -1,6 +1,8 @@
 Lorem ipsum dolor sit amet
-Нормальная форма числа с плавающей запятой
+45
 Пример
+3.501
 consectetur adipiscing
-Long
+-0.001
 тестовое задание
+100

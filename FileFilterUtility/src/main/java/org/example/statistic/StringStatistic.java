@@ -5,23 +5,18 @@ public class StringStatistic extends Statistic {
     private int maxLength = Integer.MIN_VALUE;
 
     @Override
-    public void update(String line) {
-        super.update(line);
+    public void change(String line) {
+        super.change(line);
         int length = line.length();
         if (length < minLength) minLength = length;
         if (length > maxLength) maxLength = length;
     }
 
-    @Override
-    public String summarize() {
-        String baseSummary = super.summarize();
+    public String fullStatistics() {
+        String baseSummary = shortStatistics();
         if (count > 0) {
-            return baseSummary + ", Min Length: " + minLength + ", Max Length: " + maxLength;
+            return baseSummary + ", минимальная длина строки: " + minLength + ", максимальная длина строки: " + maxLength;
         }
         return baseSummary;
-    }
-
-    public String shortSummarize(){
-        return super.summarize();
     }
 }

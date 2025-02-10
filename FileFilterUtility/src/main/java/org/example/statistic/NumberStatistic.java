@@ -6,25 +6,20 @@ public class NumberStatistic extends Statistic {
     private double sum = 0;
 
     @Override
-    public void update(String line) {
-        super.update(line);
+    public void change(String line) {
+        super.change(line);
         double value = Double.parseDouble(line);
         if (value < min) min = value;
         if (value > max) max = value;
         sum += value;
     }
 
-    @Override
-    public String summarize() {
-        String baseSummary = super.summarize();
+    public String fullStatistics() {
+        String baseSummary = shortStatistics();
         if (count > 0) {
             double average = sum / count;
-            return baseSummary + ", Min: " + min + ", Max: " + max + ", Sum: " + sum + ", Avg: " + average;
+            return baseSummary + ", минимальное значение: " + min + ", максимальное значение: " + max + ", сумма: " + sum + ", среднее: " + average;
         }
         return baseSummary;
-    }
-
-    public String shortSummarize(){
-        return super.summarize();
     }
 }
