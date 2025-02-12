@@ -1,5 +1,7 @@
 package org.example.options;
 
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,22 +43,25 @@ public class StartupOptions {
         return fullStat;
     }
 
-    private void startup() {
-        final String help = String.format("java -jar FileFilterUtility.jar <args>%n" +
-                "options:%n" +
-                "-o <путь>     Путь до файлов с результатом.%n" +
-                "-p <префикс>  Префикс имён файлов с результатом.%n" +
-                "-a            Режим добавления в существующие файлы.%n" +
-                "-s            Краткая статистика.%n" +
-                "-f            Полная статистика.%n");
-
-        if (args.length == 0 || args[0].equals("-h")) {
-            System.out.print(help);
-            return;
+    private void setOutputPath(int index) {
+        if (index + 1 < args.length) {
+            String checkPath = args[index + 1];
+            try {
+                Paths.get(checkPath);
+                outputPath = checkPath;
+            } catch (InvalidPathException e) {
+                System.err.println("Указанный путь до файлов с результатом недопустим: " + checkPath);
+            }
+        } else {
+            System.err.println("Не указан путь до файлов с результатом после опции -o");
         }
+    }
+    
+    private void startup() {
+
         for (int i = 0; i < args.length; i++) {
-            if ( args[i].equals("-o") && i+1<args.length) {
-                outputPath = args[i+1];
+            if ( args[i].equals("-o")) {
+                setOutputPath(i);
             }
             if (args[i].equals("-a")) {
                 appendMode = true;
@@ -73,10 +78,6 @@ public class StartupOptions {
             if (args[i].endsWith(".txt")) {
                 inputFiles.add(args[i]);
             }
-//            else{
-//                System.out.println("Введите команду. Для перехода к списку команд введите -h");
-//            }
         }
-
     }
 }

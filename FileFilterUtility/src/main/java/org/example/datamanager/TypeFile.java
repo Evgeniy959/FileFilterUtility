@@ -1,4 +1,4 @@
-package org.example.options;
+package org.example.datamanager;
 
 public class TypeFile {
     public static String INTEGER = "integers";

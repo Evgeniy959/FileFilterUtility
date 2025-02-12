@@ -1,7 +1,6 @@
 package org.example.datamanager;
 
 import org.example.options.StartupOptions;
-import org.example.options.TypeFile;
 import org.example.statistic.NumberStatistic;
 import org.example.statistic.StringStatistic;
 
@@ -33,7 +32,7 @@ public class TextSorter {
     public void fileProcessing() {
         deleteOutputFiles();
         try {
-            for (String inputFile : options.getInputFiles()) {
+            for (String inputFile : !options.getInputFiles().isEmpty() ? options.getInputFiles() : List.of("No file")) {
                 executor.submit(() -> {
                     dataFilter(inputFile);
                 });
@@ -59,8 +58,8 @@ public class TextSorter {
             }
             return Files.readAllLines(Paths.get(config.getProperty("file.path") + name));
         } catch (IOException e) {
-            System.err.println("Неправильно указан файл для чтения данных: " + name + e.getMessage());
-            throw new RuntimeException("Не удается найти файл!");
+            System.err.println("Неверно указан файл для чтения данных! Не удается найти файл: " + name + " " + e.getMessage());
+            throw new RuntimeException();
         }
     }
 
