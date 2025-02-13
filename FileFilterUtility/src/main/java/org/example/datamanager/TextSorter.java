@@ -41,7 +41,9 @@ public class TextSorter {
             if (!executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)) {
                 executor.shutdownNow();
             }
-            statisticsData();
+            if (!options.getInputFiles().isEmpty()) {
+                statisticsData();
+            }
         } catch (InterruptedException e) {
             System.err.println("Выполнение прервано: " + e.getMessage());
             Thread.currentThread().interrupt();
@@ -80,9 +82,10 @@ public class TextSorter {
             try {
                 writeLine(type, line);
             } catch (IOException e) {
-                System.err.println("Не удалось записать строку в файл: " + e.getMessage());
+                System.err.println("Ошибка записи строк в файл: " + e.getMessage());
             }
         }
+        System.out.println("Файл " + input + " успешно записан");
     }
 
     private void writeLine(String type, String line) throws IOException {
