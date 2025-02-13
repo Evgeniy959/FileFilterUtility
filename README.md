@@ -1,4 +1,4 @@
-## Инструкция по запуску утилиты
+# Инструкция по запуску утилиты
 Скачайте файл FileFilterUtility.jar в любое удобное место из репозитория по ссылке 
 ```bash 
 https://github.com/Evgeniy959/FileFilterUtility/blob/main/FileFilterUtility/out/artifacts/Utility_jar/FileFilterUtility.jar
