@@ -33,9 +33,7 @@ public class TextSorter {
         deleteOutputFiles();
         try {
             for (String inputFile : !options.getInputFiles().isEmpty() ? options.getInputFiles() : List.of("No file")) {
-                executor.submit(() -> {
-                    dataFilter(inputFile);
-                });
+                executor.submit(() -> dataFilter(inputFile));
             }
             executor.shutdown();
             if (!executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)) {
