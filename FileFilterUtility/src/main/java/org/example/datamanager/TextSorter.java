@@ -58,7 +58,7 @@ public class TextSorter {
             }
             return Files.readAllLines(Paths.get(config.getProperty("file.path") + name));
         } catch (IOException e) {
-            System.err.println("Неверно указан файл для чтения данных! Не удается найти файл: " + name + " " + e.getMessage());
+            System.err.println("Выполнение прервано! Неверно указан файл для чтения данных! Не удается найти файл: " + name + " " + e.getMessage());
             throw new RuntimeException();
         }
     }
