@@ -1,5 +1,5 @@
 ## Инструкция по запуску утилиты
-Скопируйте файл FileFilterUtility.jar из репозитория по ссылке в любое удобное место
+Скопируйте файл FileFilterUtility.jar из репозитория по ссылке ```bash https://github.com/Evgeniy959/FileFilterUtility/blob/main/FileFilterUtility/out/artifacts/Utility_jar/FileFilterUtility.jar ``` в любое удобное место
 Откройте командную строку в этой директории и напишите данную команду с необходимыми вам параметрами:
 ```bash
 java -jar FileFilterUtility.jar -s -a -p sample- in1.txt in2.txt.
