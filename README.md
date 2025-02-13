@@ -5,7 +5,9 @@
 java -jar FileFilterUtility.jar -s -a -p sample- in1.txt in2.txt.
 ```
 ## Особенности реализации
-Чтобы перейти к списку всех команд нужно ввести опцию **-h** в начале: java -jar FileFilterUtility.jar -h
+Чтобы перейти к списку всех команд нужно ввести опцию **-h** в начале: 
+
+java -jar FileFilterUtility.jar -h
 
 options:
 
