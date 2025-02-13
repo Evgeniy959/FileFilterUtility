@@ -1,5 +1,5 @@
 # Утилита фильтрации содержимого файлов
-# Инструкция по запуску утилиты
+## Инструкция по запуску утилиты
 Скачайте файл FileFilterUtility.jar в любое удобное место из репозитория по ссылке 
 ```bash 
 https://github.com/Evgeniy959/FileFilterUtility/blob/main/FileFilterUtility/out/artifacts/Utility_jar/FileFilterUtility.jar
@@ -8,7 +8,7 @@ https://github.com/Evgeniy959/FileFilterUtility/blob/main/FileFilterUtility/out/
 ```bash
 java -jar FileFilterUtility.jar -s -a -p sample- in1.txt in2.txt.
 ```
-## Особенности реализации
+### Особенности реализации
 Чтобы перейти к списку всех команд нужно ввести опцию **-h** в начале: 
 
 java -jar FileFilterUtility.jar -h
@@ -35,5 +35,5 @@ options:
 Если директория для записи результатов не существует, то она будет создана.
 
 Для поочередного считывания файлов используется многопоточность.
-### Версия java - 23.
-### Система сборки - Maven 3.9.9. 
+#### Версия java - 23.
+#### Система сборки - Maven 3.9.9. 
