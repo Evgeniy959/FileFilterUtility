@@ -1,180 +1,130 @@
 package org.example.datamanager;
 
 import org.example.options.StartupOptions;
-import org.example.options.TypeFile;
+import org.example.statistic.NumberStatistic;
+import org.example.statistic.StringStatistic;
 
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class TextSorter {
 
     private final StartupOptions options;
     private final ExecutorService executor;
-    StringBuffer bufferIntegers = new StringBuffer();
-    StringBuffer bufferFloats = new StringBuffer();
-    StringBuffer bufferStrings = new StringBuffer();
-    List<String> lines = new ArrayList<>();
-    boolean flag = false;
+    private final NumberStatistic integerStat = new NumberStatistic();
+    private final NumberStatistic floatStat = new NumberStatistic();
+    private final StringStatistic stringStat = new StringStatistic();
 
     public TextSorter(StartupOptions options) {
         this.options = options;
         this.executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
-    public void processFiles() {
+    public void fileProcessing() {
+        deleteOutputFiles();
         try {
-            for (String inputFile : options.getInputFiles()) {
-                executor.submit(() -> {
-                    dataFilter(inputFile);
-                });
+            for (String inputFile : !options.getInputFiles().isEmpty() ? options.getInputFiles() : List.of("No file")) {
+                executor.submit(() -> dataFilter(inputFile));
             }
             executor.shutdown();
             if (!executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)) {
                 executor.shutdownNow();
             }
-            //summarizeStatistics();
+            if (!options.getInputFiles().isEmpty()) {
+                statisticsData();
+            }
         } catch (InterruptedException e) {
             System.err.println("Выполнение прервано: " + e.getMessage());
             Thread.currentThread().interrupt();
         } catch (Exception e) {
             System.err.println("Непредвиденная ошибка: " + e.getMessage());
         }
-//        for (String inputFile : options.getInputFiles()) {
-//            //executor.submit(() -> {
-//            dataFilter(inputFile);
-//        }
-        //dataFilter(options.getInputFile());
-
     }
-//public void processFiles() {
-//
-//    try {
-//        for (String inputFile : options.getInputFiles()) {
-//            if (inputFile.equals("in1.txt")){
-//                if (!flag){
-//                    dataFilter(inputFile);
-//                }
-//
-//            } else /*if (flag)*/{
-//                //inputFile = "in2.txt";
-//                dataFilter(inputFile);
-//                flag = true;
-//            }
-//        }
-//    } catch (Exception e) {
-//        System.err.println("Непредвиденная ошибка: " + e.getMessage());
-//    }
-//}
 
-    private synchronized List<String> loadContent(String name) {
+    public synchronized List<String> loadContent(String name) {
         try {
-//            var is = ClassLoader.getSystemResource("input/" + name);
-//            System.out.println(is);
-
-            return Files.readAllLines(Paths.get("D:\\D Aser\\Test2\\Java\\JavaProjects\\Projects\\FileFilterUtility\\src\\main\\java\\org\\example\\input\\" + name), UTF_8);
-            //return lines;
-//            var is = ClassLoader.getSystemResourceAsStream("input/" + name + ".txt");
-//            return new String(is.readAllBytes());
+            var config = new Properties();
+            try (var is = ClassLoader.getSystemResourceAsStream("app.properties")) {
+                config.load(is);
+            }
+            return Files.readAllLines(Paths.get(config.getProperty("file.path") + name));
         } catch (IOException e) {
-            System.err.println("Неправильно указан файл для чтения данных: " + name + e.getMessage());
-            throw new RuntimeException("Не удается найти файл!");
+            System.err.println("Выполнение прервано! Неверно указан файл для чтения данных! Не удается найти файл: " + name + " " + e.getMessage());
+            throw new RuntimeException();
         }
-        //return List.of("apple", "banana", "orange");
     }
 
     private void dataFilter(String input) {
         String type;
-        //List<String> lines = loadContent(input);
-//        for (int i = 0; i < loadContent(input).size(); i++) {
-//            System.out.println(lines.get(i));
-//        }
-        //String[] lines = str.split("/n");
-
-        for(String line : loadContent(input)){
+        List<String> lines = loadContent(input);
+        for(String line : lines){
             if (DataParser.isInteger(line)) {
-                //type = "integers";
-                bufferIntegers.append(String.format(line+"%n"));
-                //writeLine(type, bufferIntegers.toString());
-                //for (int i = 0; i < lines.length; i++) {
-                    //System.out.println(bufferIntegers.toString());
-                //}
-                //integerStat.update(line);
+                type = TypeFile.INTEGER;
+                integerStat.change(line);
             } else if (DataParser.isFloat(line)) {
-                //type = "floats";
-                bufferFloats.append(String.format(line+"%n"));
-                //writeLine(type, bufferFloats.toString());
-                //floatStat.update(line);
+                type = TypeFile.FLOAT;
+                floatStat.change(line);
             } else {
-                //type = "strings";
-                bufferStrings.append(String.format(line+"%n"));
-                //writeLine(type, bufferStrings.toString());
-                //stringStat.update(line);
+                type = TypeFile.STRING;
+                stringStat.change(line);
             }
-            //if (!flag) break;
+            try {
+                writeLine(type, line);
+            } catch (IOException e) {
+                System.err.println("Ошибка записи строк в файл: " + e.getMessage());
+            }
         }
-        //System.out.println(bufferFloats.toString());
-        try {
-            writeLine();
-        } catch (IOException e) {
-            System.err.println("Не удалось записать строку в файл: " + e.getMessage());
-        }
-//        if (Parser.isInteger(line)) {
-//            type = Constants.INTEGER;
-//            integerStat.update(line);
-//        } else if (Parser.isFloat(line)) {
-//            type = Constants.FLOAT;
-//            floatStat.update(line);
-//        } else {
-//            type = Constants.STRING;
-//            stringStat.update(line);
-//        }
-
-//        try {
-//            writeLine(type, line);
-//        } catch (IOException e) {
-//            System.err.println("Failed to write line to file: " + e.getMessage());
-//        }
+        System.out.println("Файл " + input + " успешно записан");
     }
 
-    private void writeLine() throws IOException {
-        //String fileName = options.getOutputPath() + "/" + options.getPrefix() + type + ".txt";
-        System.out.println(bufferFloats.toString());
-        String[] fileTypes = {TypeFile.INTEGER, TypeFile.FLOAT, TypeFile.STRING};
-        for (String type : fileTypes) {
-            String fileName = options.getOutputPath() + "/" + options.getPrefix() + type + ".txt";
-            try (FileWriter writer = new FileWriter(fileName, options.isAppendMode())) {
-                if (type.equals(TypeFile.INTEGER)){
-                    writer.write(bufferIntegers.toString());
-                    writer.flush();
-                    //writer.newLine();
-                }
-                else if (type.equals(TypeFile.FLOAT)){
-                    writer.write(bufferFloats.toString());
-                    writer.flush();
-                    //writer.newLine();
-                }
-                else if (type.equals(TypeFile.STRING)){
-                    writer.write(bufferStrings.toString());
-                    writer.flush();
-                    //writer.newLine();
-                }
+    private void writeLine(String type, String line) throws IOException {
+        String fileName = options.getOutputPath() + "/" + options.getPrefix() + type + ".txt";
+        Path filePath = Paths.get(fileName);
+        Path parentDir = filePath.getParent();
+        if (!Files.exists(parentDir)) {
+            Files.createDirectories(parentDir);
+        }
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true))) {
+                writer.write(line);
+                writer.newLine();
+        }
+    }
 
+    private void deleteOutputFiles() {
+        if (!options.isAppendMode()) {
+            String[] fileTypes = {TypeFile.INTEGER, TypeFile.FLOAT, TypeFile.STRING};
+            for (String type : fileTypes) {
+                String fileName = options.getOutputPath() + "/" + options.getPrefix() + type + ".txt";
+                Path filePath = Paths.get(fileName);
+                try {
+                    Files.deleteIfExists(filePath);
+                } catch (IOException e) {
+                    System.err.println("Не удалось удалить существующий файл: " + fileName + ". " + e.getMessage());;
+                }
             }
         }
-//        Path filePath = Paths.get(fileName);
-//        Path parentDir = filePath.getParent();
-//
-//        if (!Files.exists(parentDir)) {
-//            Files.createDirectories(parentDir);
-//        }
+    }
+
+    private void statisticsData() {
+        if (options.isShortStat()) {
+            System.out.println("Краткая статистика:");
+            System.out.println("Integers: " + integerStat.shortStatistics());
+            System.out.println("Floats: " + floatStat.shortStatistics());
+            System.out.println("Strings: " + stringStat.shortStatistics());
+        } else if (options.isFullStat()) {
+            System.out.println("Полная статистика:");
+            System.out.println("Integers: " + integerStat.fullStatistics());
+            System.out.println("Floats: " + floatStat.fullStatistics());
+            System.out.println("Strings: " + stringStat.fullStatistics());
+        }
     }
 }

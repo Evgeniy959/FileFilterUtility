@@ -1,5 +1,7 @@
 package org.example.options;
 
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,8 +9,9 @@ public class StartupOptions {
     private final String[] args;
     private static String outputPath = "./";
     private static String prefix = "";
-    private static String inputFile;
     private static boolean appendMode = false;
+    private boolean shortStat = false;
+    private boolean fullStat = false;
     private final List<String> inputFiles = new ArrayList<>();
 
     public StartupOptions(String[] args) {
@@ -24,10 +27,6 @@ public class StartupOptions {
         return prefix;
     }
 
-    public String getInputFile() {
-        return inputFile;
-    }
-
     public List<String> getInputFiles() {
         return inputFiles;
     }
@@ -36,21 +35,49 @@ public class StartupOptions {
         return appendMode;
     }
 
-    private void startup() {
-        for (int i = 0; i < args.length; i++) {
-            if ( args[i].equals("-o") && i+1<args.length) {
-                outputPath = args[i+1];
+    public boolean isShortStat() {
+        return shortStat;
+    }
+
+    public boolean isFullStat() {
+        return fullStat;
+    }
+
+    private void setOutputPath(int index) {
+        if (index + 1 < args.length) {
+            String checkPath = args[index + 1];
+            try {
+                Paths.get(checkPath);
+                outputPath = checkPath;
+            } catch (InvalidPathException e) {
+                System.err.println("Указанный путь до файлов с результатом недопустим: " + checkPath);
             }
-            else if (args[i].equals("-a")) {
+        } else {
+            System.err.println("Не указан путь до файлов с результатом после опции -o");
+        }
+    }
+    
+    private void startup() {
+
+        for (int i = 0; i < args.length; i++) {
+            if ( args[i].equals("-o")) {
+                setOutputPath(i);
+            }
+            if (args[i].equals("-a")) {
                 appendMode = true;
             }
-            else if (args[i].equals("-p") && i+1<args.length){
+            if (args[i].equals("-p") && i+1<args.length){
                 prefix = args[i+1];
             }
-            else if (args[i].endsWith(".txt")) {
+            if(args[i].equals("-s")){
+                shortStat = true;
+            }
+            if(args[i].equals("-f")){
+                fullStat = true;
+            }
+            if (args[i].endsWith(".txt")) {
                 inputFiles.add(args[i]);
             }
         }
-
     }
 }
