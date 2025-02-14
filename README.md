@@ -2,7 +2,7 @@
 ## Инструкция по запуску утилиты
 Скачайте файл FileFilterUtility.jar в любое удобное место из репозитория по ссылке 
 ```bash 
-FileFilterUtility/out/artifacts/Utility_jar/FileFilterUtility.jar
+https://github.com/Evgeniy959/FileFilterUtility/blob/develop/FileFilterUtility/out/artifacts/Utility_jar/FileFilterUtility.jar
 ``` 
 Откройте командную строку в этой директории и напишите данную команду с необходимыми вам параметрами:
 ```bash
